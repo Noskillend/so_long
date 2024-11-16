@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:38:09 by jco               #+#    #+#             */
-/*   Updated: 2024/11/16 19:19:04 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/16 21:41:00 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,18 +50,50 @@ void	destroy_game(t_game *game)
 	destroy_map(game->map);
 }
 
-void	flood_fill(char **map, int x, int y, t_game *game)
+int	flood_fill(char **map, int x, int y, t_game *game, char target)
+{
+	int	count;
+
+	if (x < 0 || y < 0 || x >= game->map_width || y >= game->map_height)
+		return (0);
+	if (map[y][x] == '1' || map[y][x] == 'V')
+		return (0);
+	if (map[y][x] == 'E' && target == 'C')
+		return (0);
+	count = 0;
+	if (map[y][x] == target)
+		count++;
+	map[y][x] = 'V';
+	count += flood_fill(map, x + 1, y, game, target);
+	count += flood_fill(map, x - 1, y, game, target);
+	count += flood_fill(map, x, y + 1, game, target);
+	count += flood_fill(map, x, y - 1, game, target);
+	return (count);
+}
+
+
+int	can_reach_exit_after_collecting(char **map, int x, int y, t_game *game)
 {
 	if (x < 0 || y < 0 || x >= game->map_width || y >= game->map_height)
-		return ;
-	if (map[y][x] == '1' || map[y][x] == 'V')
-		return ;
+		return (0);
+	// Ignorez les cases non marchables ou déjà visitées
+	if (map[y][x] == '1' || map[y][x] == 'V') // 'V' pour Visité
+		return (0);
+
+	// Si on atteint la sortie, c'est valide
+	if (map[y][x] == 'E')
+		return (1);
+
+	// Marquez la case comme visitée
 	map[y][x] = 'V';
-	flood_fill(map, x + 1, y, game);
-	flood_fill(map, x - 1, y, game);
-	flood_fill(map, x, y + 1, game);
-	flood_fill(map, x, y - 1, game);
+
+	// Explorez dans les 4 directions
+	return (can_reach_exit_after_collecting(map, x + 1, y, game)
+		|| can_reach_exit_after_collecting(map, x - 1, y, game)
+		|| can_reach_exit_after_collecting(map, x, y + 1, game)
+		|| can_reach_exit_after_collecting(map, x, y - 1, game));
 }
+
 
 int	count_remaining_elements(char **map, int height, int width, char element)
 {
@@ -88,11 +120,11 @@ int	count_remaining_elements(char **map, int height, int width, char element)
 int	is_map_playable(t_game *game)
 {
 	char	**copy;
-	int		y;
 	int		player_x = -1;
 	int		player_y = -1;
+	int		y;
 
-	// Faire une copie de la carte
+	// Étape 1 : Faire une copie de la carte
 	copy = malloc(sizeof(char *) * (game->map_height + 1));
 	if (!copy)
 		return (0);
@@ -104,7 +136,7 @@ int	is_map_playable(t_game *game)
 	}
 	copy[y] = NULL;
 
-	// Trouver la position du joueur
+	// Étape 2 : Trouver la position du joueur
 	y = 0;
 	while (y < game->map_height)
 	{
@@ -121,18 +153,39 @@ int	is_map_playable(t_game *game)
 		}
 		y++;
 	}
+
 	if (player_x == -1 || player_y == -1)
 	{
 		ft_printf("Error: Player position not found.\n");
 		return (0);
 	}
 
-	// Effectuer le flood fill
-	flood_fill(copy, player_x, player_y, game);
+	// Étape 3 : Vérifiez que tous les collectibles sont atteignables
+	int collectibles_count = count_remaining_elements(game->map, game->map_height, game->map_width, 'C');
+	int reached_collectibles = flood_fill(copy, player_x, player_y, game, 'C');
+	if (reached_collectibles != collectibles_count)
+	{
+		ft_printf("Error: Not all collectibles are reachable.\n");
+		return (0);
+	}
 
-	// Vérifier qu'il ne reste aucun collectible ou sortie
-	int collectibles_left = count_remaining_elements(copy, game->map_height, game->map_width, 'C');
-	int exit_left = count_remaining_elements(copy, game->map_height, game->map_width, 'E');
+	// Étape 4 : Réinitialiser la copie pour vérifier la sortie
+	y = 0;
+	while (y < game->map_height)
+	{
+		free(copy[y]);
+		copy[y] = ft_strdup(game->map[y]);
+		y++;
+	}
+	copy[y] = NULL;
+
+	// Étape 5 : Vérifiez que la sortie est atteignable après avoir collecté tous les collectibles
+	int exit_reachable = flood_fill(copy, player_x, player_y, game, 'E');
+	if (exit_reachable == 0)
+	{
+		ft_printf("Error: Exit is not reachable after collecting all collectibles.\n");
+		return (0);
+	}
 
 	// Libérer la mémoire
 	y = 0;
@@ -140,10 +193,7 @@ int	is_map_playable(t_game *game)
 		free(copy[y++]);
 	free(copy);
 
-	if (collectibles_left > 0 || exit_left > 0)
-	{
-		ft_printf("Error: Some elements are not reachable.\n");
-		return (0);
-	}
 	return (1);
 }
+
+

@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:06:46 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/16 19:14:01 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/16 21:21:46 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ int	check_rectangular(t_game *game)
 int	check_surrounded_by_walls(t_game *game)
 {
 	int	x;
+	int	y;
 
-	// Vérifier la première et la dernière ligne
 	x = 0;
 	while (x < game->map_width)
 	{
@@ -73,9 +73,7 @@ int	check_surrounded_by_walls(t_game *game)
 		}
 		x++;
 	}
-
-	// Vérifier les bords gauche et droit
-	int	y = 0;
+	y = 0;
 	while (y < game->map_height)
 	{
 		if (game->map[y][0] != '1' || game->map[y][game->map_width - 1] != '1')

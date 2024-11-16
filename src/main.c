@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:03:03 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/16 16:46:37 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/16 21:44:50 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	main(int argc, char **argv)
 
 	if (argc != 2)
 	{
-		ft_printf("Erorr: Invalid number of arguments.\n");
+		ft_printf("Error: Invalid number of arguments.\n");
 		return (1);
 	}
 	if (!init_game(&game, argv[1]))
@@ -27,7 +27,9 @@ int	main(int argc, char **argv)
 		ft_putstr_fd("Error: Failed to initialize the game.\n", 2);
 		return (1);
 	}
+	setup_player_position(&game);
 	render_map(&game);
+	mlx_key_hook(game.win, handle_keypress, &game);
 	mlx_loop(game.mlx);
 	destroy_game(&game);
 	return (0);
