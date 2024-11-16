@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jco <jco@student.42.fr>                    +#+  +:+       +#+         #
+#    By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/10 16:21:34 by jco               #+#    #+#              #
-#    Updated: 2024/06/12 16:19:50 by jco              ###   ########.fr        #
+#    Updated: 2024/11/16 01:53:37 by noskillend       ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,7 +38,7 @@ OBJS_GNL = $(SRC_GNL:.c=.o)
 
 OBJS_ALL = ${SRC_ALL:.c=.o}
 
-FLAGS = -Wall -Werror -Wextra
+FLAGS = -Wall -Werror -Wextra -fPIE
 
 CC = cc
 

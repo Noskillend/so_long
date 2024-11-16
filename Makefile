@@ -3,59 +3,60 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jco <jco@student.42.fr>                    +#+  +:+       +#+         #
+#    By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/15 11:16:51 by jco               #+#    #+#              #
-#    Updated: 2024/11/15 11:21:23 by jco              ###   ########.fr        #
+#    Updated: 2024/11/16 01:52:07 by noskillend       ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+# Nom de l'exécutable
 NAME = so_long
-CC = gcc 
+
+# Compilateur et options
+CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g3
 
-# Detect the OS
-UNAME_S := $(shell uname -s)
+# Répertoires
+SRCS_DIR = src
+OBJS_DIR = obj
+MLX_DIR = minilibx
+LIBFT_DIR = libft
 
-# Set platform-specific variables
-ifeq ($(UNAME_S), Linux)
-    MLX_DIR = ./minilibx-linux
-    MLX = $(MLX_DIR)/libmlx.a
-    MLX_FLAGS = -L$(MLX_DIR) -lmlx -lXext -lX11 -lm -lbsd
-    LIBS = -lX11 -lXext -lm -lbsd
-endif
+# Sources et objets
+SRCS = $(wildcard $(SRCS_DIR)/*.c)
+OBJS = $(patsubst $(SRCS_DIR)/%.c, $(OBJS_DIR)/%.o, $(SRCS))
 
-ifeq ($(UNAME_S), Darwin)
-    MLX_DIR = ./minilibx-mac
-    MLX = $(MLX_DIR)/libmlx.a
-    MLX_FLAGS = -L$(MLX_DIR) -lmlx -framework OpenGL -framework AppKit
-    LIBS = -framework OpenGL -framework AppKit
-endif
+# Bibliothèques
+LIBFT = $(LIBFT_DIR)/libft.a
+MLX_LIB = $(MLX_DIR)/libmlx.a
 
-ifeq ($(OS), Windows_NT)
-    MLX_DIR = ./minilibx-windows
-    MLX = $(MLX_DIR)/libmlx.a
-    MLX_FLAGS = -L$(MLX_DIR) -lmlx -lXext -lX11 -lm -lbsd
-    LIBS = -lX11 -lXext -lm -lbsd
-endif
+# Options pour MiniLibX sous Linux
+MLX_FLAGS = -L$(MLX_DIR) -lmlx -lX11 -lXext -lbsd
 
-SRCS = main.c
-OBJS = $(SRCS:.c=.o)
-
+# Commandes de Make
 all: $(NAME)
 
-$(NAME): $(OBJS) $(MLX)
-    $(CC) $(CFLAGS) $(OBJS) $(MLX_FLAGS) -o $(NAME)
+$(NAME): $(OBJS) $(MLX_LIB) $(LIBFT)
+	$(CC) $(CFLAGS) $(OBJS) $(MLX_LIB) $(MLX_FLAGS) -I$(LIBFT_DIR) -L$(LIBFT_DIR) -lft -o $(NAME)
 
-$(MLX):
-    make -C $(MLX_DIR)
+$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c
+	@mkdir -p $(OBJS_DIR)
+	$(CC) $(CFLAGS) -I$(MLX_DIR) -I$(LIBFT_DIR) -c $< -o $@
+
+$(MLX_LIB):
+	$(MAKE) -C $(MLX_DIR)
+
+$(LIBFT):
+	$(MAKE) -C $(LIBFT_DIR)
 
 clean:
-    rm -f $(OBJS)
-    make clean -C $(MLX_DIR)
+	rm -rf $(OBJS_DIR)
+	$(MAKE) -C $(MLX_DIR) clean
+	$(MAKE) -C $(LIBFT_DIR) clean
 
 fclean: clean
-    rm -f $(NAME)
-    make fclean -C $(MLX_DIR)
+	rm -f $(NAME)
+	$(MAKE) -C $(LIBFT_DIR) fclean
 
 re: fclean all
