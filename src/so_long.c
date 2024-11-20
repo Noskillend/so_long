@@ -6,17 +6,49 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:38:09 by jco               #+#    #+#             */
-/*   Updated: 2024/11/20 11:04:14 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/20 13:07:49 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minilibx/mlx.h"
 #include "../includes/so_long.h"
 
+
+void init_struct(t_game *game)
+{
+    if (!game)
+        return;
+
+    game->mlx = NULL;
+    game->win = NULL;
+    game->map = NULL;
+    game->map_width = 0;
+    game->map_height = 0;
+    game->floor_img = NULL;
+    game->wall_img = NULL;
+    game->player_img = NULL;
+    game->collectible_img = NULL;
+    game->exit_img = NULL;
+    game->player_x = 0;
+    game->player_y = 0;
+    game->collectibles = 0;
+    game->player_count = 0;
+    game->exit_count = 0;
+    game->player_img_up = NULL;
+    game->player_img_down = NULL;
+    game->player_img_left = NULL;
+    game->player_img_right = NULL;
+    game->current_player_img = NULL;
+    game->steps = 0;
+}
+
+
 int	init_game(t_game *game, const char *map_path)
 {
 	int	width;
 	int	height;
+	
+	init_struct(game);
 
 	game->map = load_map(map_path, &game->map_width, &game->map_height);
 	if (!game->map)
@@ -44,20 +76,44 @@ if (!validate_map(game))
 
 	if (!game->floor_img || !game->wall_img || !game->player_img
 		|| !game->collectible_img || !game->exit_img)
+	{
+		destroy_game(game);
 		return (0);
+	}
 	return (1);
 }
 
-void	destroy_game(t_game *game)
+void destroy_game(t_game *game)
 {
-	mlx_destroy_window(game->mlx, game->win);
-	mlx_destroy_image(game->mlx, game->floor_img);
-	mlx_destroy_image(game->mlx, game->wall_img);
-	mlx_destroy_image(game->mlx, game->player_img);
-	mlx_destroy_image(game->mlx, game->collectible_img);
-	mlx_destroy_image(game->mlx, game->exit_img);
-	destroy_map(game->map);
+	if (game->win)
+		mlx_destroy_window(game->mlx, game->win);
+	if (game->floor_img)
+		mlx_destroy_image(game->mlx, game->floor_img);
+	if (game->wall_img)
+		mlx_destroy_image(game->mlx, game->wall_img);
+	if (game->player_img)
+		mlx_destroy_image(game->mlx, game->player_img);
+	if (game->player_img_up)
+		mlx_destroy_image(game->mlx, game->player_img_up);
+	if (game->player_img_down)
+		mlx_destroy_image(game->mlx, game->player_img_down);
+	if (game->player_img_left)
+		mlx_destroy_image(game->mlx, game->player_img_left);
+	if (game->player_img_right)
+		mlx_destroy_image(game->mlx, game->player_img_right);
+	if (game->collectible_img)
+		mlx_destroy_image(game->mlx, game->collectible_img);
+	if (game->exit_img)
+		mlx_destroy_image(game->mlx, game->exit_img);
+	if (game->mlx)
+	{
+		mlx_destroy_display(game->mlx); // Libère les ressources système MLX
+		free(game->mlx);
+	}
+	destroy_map(game->map); // Libère la carte
 }
+
+
 
 int	flood_fill(char **map, int x, int y, t_game *game, char target)
 {
@@ -119,79 +175,85 @@ int	count_remaining_elements(char **map, int height, int width, char element)
 	return (count);
 }
 
-int	is_map_playable(t_game *game)
+void	free_copy(char **copy, int rows)
 {
-	char	**copy;
-	int		player_x = -1;
-	int		player_y = -1;
-	int		y;
+	int	i;
 
-	copy = malloc(sizeof(char *) * (game->map_height + 1));
-	if (!copy)
-		return (0);
-	y = 0;
-	while (y < game->map_height)
-	{
-		copy[y] = ft_strdup(game->map[y]);
-		y++;
-	}
-	copy[y] = NULL;
-	y = 0;
-	while (y < game->map_height)
-	{
-		int	x = 0;
-		while (x < game->map_width)
-		{
-			if (game->map[y][x] == 'P')
-			{
-				player_x = x;
-				player_y = y;
-				break ;
-			}
-			x++;
-		}
-		y++;
-	}
-	if (player_x == -1 || player_y == -1)
-	{
-		ft_printf("Error: Player position not found.\n");
-		return (0);
-	}
-
-	// Étape 3 : Vérifiez que tous les collectibles sont atteignables
-	int collectibles_count = count_remaining_elements(game->map, game->map_height, game->map_width, 'C');
-	int reached_collectibles = flood_fill(copy, player_x, player_y, game, 'C');
-	if (reached_collectibles != collectibles_count)
-	{
-		ft_printf("Error: Not all collectibles are reachable.\n");
-		return (0);
-	}
-
-	// Étape 4 : Réinitialiser la copie pour vérifier la sortie
-	y = 0;
-	while (y < game->map_height)
-	{
-		free(copy[y]);
-		copy[y] = ft_strdup(game->map[y]);
-		y++;
-	}
-	copy[y] = NULL;
-
-	// Étape 5 : Vérifiez que la sortie est atteignable après avoir collecté tous les collectibles
-	int exit_reachable = flood_fill(copy, player_x, player_y, game, 'E');
-	if (exit_reachable == 0)
-	{
-		ft_printf("Error: Exit is not reachable after collecting all collectibles.\n");
-		return (0);
-	}
-
-	// Libérer la mémoire
-	y = 0;
-	while (y < game->map_height)
-		free(copy[y++]);
+	i = 0;
+	while (i < rows)
+		free(copy[i++]);
 	free(copy);
-
-	return (1);
 }
+
+int is_map_playable(t_game *game)
+{
+    char **copy;
+    int player_x = -1;
+    int player_y = -1;
+    int y;
+
+    copy = malloc(sizeof(char *) * (game->map_height + 1));
+    if (!copy)
+        return (0);
+
+    // Duplication de la map
+    for (y = 0; y < game->map_height; y++)
+    {
+        copy[y] = ft_strdup(game->map[y]);
+        if (!copy[y]) // Si l'allocation échoue, libérer ce qui est déjà alloué
+        {
+            free_copy(copy, y);
+            return (0);
+        }
+    }
+    copy[y] = NULL;
+
+    // Recherche de la position du joueur
+    for (y = 0; y < game->map_height; y++)
+    {
+        for (int x = 0; x < game->map_width; x++)
+        {
+            if (game->map[y][x] == 'P')
+            {
+                player_x = x;
+                player_y = y;
+                break;
+            }
+        }
+    }
+    if (player_x == -1 || player_y == -1)
+    {
+        ft_printf("Error: Player position not found.\n");
+        free_copy(copy, game->map_height);
+        return (0);
+    }
+
+    // Validation des collectibles
+    int collectibles_count = count_remaining_elements(game->map, game->map_height, game->map_width, 'C');
+    int reached_collectibles = flood_fill(copy, player_x, player_y, game, 'C');
+    if (reached_collectibles != collectibles_count)
+    {
+        ft_printf("Error: Not all collectibles are reachable.\n");
+        free_copy(copy, game->map_height);
+        return (0);
+    }
+
+    // Revalidation pour l'accès à la sortie
+    for (y = 0; y < game->map_height; y++)
+        ft_memcpy(copy[y], game->map[y], game->map_width);
+
+    int exit_reachable = flood_fill(copy, player_x, player_y, game, 'E');
+    if (exit_reachable == 0)
+    {
+        ft_printf("Error: Exit is not reachable after collecting all collectibles.\n");
+        free_copy(copy, game->map_height);
+        return (0);
+    }
+
+    // Nettoyage final
+    free_copy(copy, game->map_height);
+    return (1);
+}
+
 
 

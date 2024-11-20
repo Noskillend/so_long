@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:03:03 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/20 11:20:47 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/20 12:59:59 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ int	main(int argc, char **argv)
 	if (!init_game(&game, argv[1]))
 	{
 		ft_printf("Error: Failed to initialize the game.\n");
+		destroy_game(&game);
 		return (1);
 	}
 	setup_player_position(&game);
@@ -41,5 +42,6 @@ int	main(int argc, char **argv)
 	mlx_hook(game.win, 2, 1L << 0, handle_keypress, &game);
 	mlx_hook(game.win, 17, 0, handle_close, &game);
 	mlx_loop(game.mlx);
+	destroy_game(&game);
 	return (0);
 }

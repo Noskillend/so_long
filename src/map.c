@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:06:46 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/20 11:29:18 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/20 12:23:45 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,11 +94,11 @@ int	check_required_elements(t_game *game)
 	game->collectibles = 0;
 	game->player_count = 0;
 	game->exit_count = 0;
-	y = -1;
-	while (y++ < game->map_height)
+	y = 0;
+	while (y < game->map_height)
 	{
-		x = -1;
-		while (x++ < game->map_width)
+		x = 0;
+		while (x < game->map_width)
 		{
 			if (game->map[y][x] == 'C')
 				game->collectibles++;
@@ -106,7 +106,9 @@ int	check_required_elements(t_game *game)
 				game->player_count++;
 			else if (game->map[y][x] == 'E')
 				game->exit_count++;
+			x++;
 		}
+		y++;
 	}
 	if (game->player_count != 1 || game->exit_count != 1 || game->collectibles < 1)
 	{
@@ -115,6 +117,7 @@ int	check_required_elements(t_game *game)
 	}
 	return (1);
 }
+
 
 int	validate_map(t_game *game)
 {
@@ -155,6 +158,7 @@ int	count_lines(const char *path)
 	return (lines + 1);
 }
 
+
 char	**load_map(const char *map_path, int *width, int *height)
 {
 	int		fd;
@@ -191,24 +195,27 @@ char	**load_map(const char *map_path, int *width, int *height)
 	return (map);
 }
 
-void	destroy_map(char **map)
+void destroy_map(char **map)
 {
-	int	i;
+    int i = 0;
 
-	if (!map)
-		return ;
-	i = 0;
-	while (map[i])
-		free(map[i++]);
-	free(map);
+    if (!map)
+        return;
+    while (map[i])
+    {
+        free(map[i]);
+        i++;
+    }
+    free(map);
 }
+
 
 int	is_valid_extension(const char *filename, const char *ext)
 {
 	int	filename_len;
 	int	ext_len;
 
-	if (!filename || !ext)
+	if(!filename || !ext)
 		return (0);
 	filename_len = ft_strlen(filename);
 	ext_len = ft_strlen(ext);

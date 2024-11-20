@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:07:41 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/20 11:20:24 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/20 12:08:42 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,4 @@ void render_map(t_game *game)
 		}
 		y++;
 	}
-	ft_printf("Map rendered.\n");
 }
-
-
-
-

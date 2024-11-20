@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:31:38 by jco               #+#    #+#             */
-/*   Updated: 2024/11/20 11:14:49 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/20 12:52:42 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef struct s_game
 	void	*player_img_right;
 	void	*current_player_img;
 	int		steps;
+
 }	t_game;
 
 int		init_game(t_game *game, const char *map_path);
