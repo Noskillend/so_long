@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:31:38 by jco               #+#    #+#             */
-/*   Updated: 2024/11/20 18:19:14 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/20 21:27:47 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,10 @@ void	setup_player_position(t_game *game);
 void	move_player(t_game *game, int x, int y, char direction);
 int		handle_keypress(int keycode, t_game *game);
 int		count_collectibles(char **map, int height, int width);
+
+int		validate_map_and_extension(t_game *game, const char *map_path);
+int		initialize_images(t_game *game, int *width, int *height);
+int		initialize_window_and_images(t_game *game);
 
 #endif
 
