@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:31:38 by jco               #+#    #+#             */
-/*   Updated: 2024/11/20 17:33:20 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/20 18:19:14 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,11 @@ typedef struct s_game
 }	t_game;
 
 int		init_game(t_game *game, const char *map_path);
+int		load_player_textures(t_game *game);
+int		load_static_textures(t_game *game);
+int		load_textures(t_game *game);
+void	destroy_textures(t_game *game);
+int		validate_player_position(t_game *game, char **copy);
 void	render_map(t_game *game);
 char	**allocate_map(int lines);
 int		open_file(const char *path);
@@ -58,6 +63,8 @@ int		fil_map(char **map, int fd, int lines);
 char	**load_map(const char *map_path, int *width, int *height);
 void	destroy_map(char **map);
 void	destroy_game(t_game *game);
+int		find_player_position(t_game *game, int *player_x, int *player_y);
+int 	validate_player_position(t_game *game, char **copy);
 int		validate_map(t_game *game);
 int		check_valid_characters(t_game *game);
 int		check_rectangular(t_game *game);
@@ -74,7 +81,6 @@ void	setup_player_position(t_game *game);
 void	move_player(t_game *game, int x, int y, char direction);
 int		handle_keypress(int keycode, t_game *game);
 int		count_collectibles(char **map, int height, int width);
-void	print_map(char **map, int height, int width);
 
 #endif
 
