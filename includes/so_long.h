@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:31:38 by jco               #+#    #+#             */
-/*   Updated: 2024/11/16 21:33:21 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/20 11:14:49 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,22 +25,29 @@
 
 typedef struct s_game
 {
-    void    *mlx;
-    void    *win;
-    char    **map;
-    int     map_width;
-    int     map_height;
-    void    *floor_img;
-    void    *wall_img;
-    void    *player_img;
-    void    *collectible_img;
-    void    *exit_img;
-    int     player_x;
-    int     player_y;
-    int     collectibles;
+	void	*mlx;
+	void	*win;
+	char	**map;
+	int		map_width;
+	int		map_height;
+	void	*floor_img;
+	void	*wall_img;
+	void	*player_img;
+	void	*collectible_img;
+	void	*exit_img;
+	int		player_x;
+	int		player_y;
+	int		collectibles;
+	int		player_count;
+	int		exit_count;
+	void	*player_img_up;
+	void	*player_img_down;
+	void	*player_img_left;
+	void	*player_img_right;
+	void	*current_player_img;
+	int		steps;
 }	t_game;
 
-// Prototypes
 int		init_game(t_game *game, const char *map_path);
 void	render_map(t_game *game);
 char	**load_map(const char *map_path, int *width, int *height);
@@ -58,9 +65,10 @@ int		count_remaining_elements(char **map, int height, int width, char element);
 int		is_map_playable(t_game *game);
 int		is_valid_extension(const char *filename, const char *ext);
 void	setup_player_position(t_game *game);
-void	move_player(t_game *game, int x, int y);
+void	move_player(t_game *game, int x, int y, char direction);
 int		handle_keypress(int keycode, t_game *game);
 int		count_collectibles(char **map, int height, int width);
+void	print_map(char **map, int height, int width);
 
 #endif
 

@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:38:09 by jco               #+#    #+#             */
-/*   Updated: 2024/11/16 21:41:00 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/20 11:04:14 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,25 @@ int	init_game(t_game *game, const char *map_path)
 		return (0);
 	if (!is_valid_extension(map_path, ".ber"))
 		return (0);
-	if (!validate_map(game))
-		return (0);
+if (!validate_map(game))
+{
+	ft_printf("Error: Map validation failed.\n");
+	return (0);
+}
+	game->steps = 0;
 	game->mlx = mlx_init();
-	game->win = mlx_new_window(game->mlx, game->map_width * TILE_SIZE,
-		game->map_height * TILE_SIZE, "so_long");
+	game->win = mlx_new_window(game->mlx, game->map_width * TILE_SIZE,game->map_height * TILE_SIZE, "so_long");
 	game->floor_img = mlx_xpm_file_to_image(game->mlx, "textures/sol.xpm", &width, &height);
 	game->wall_img = mlx_xpm_file_to_image(game->mlx, "textures/bush.xpm", &width, &height);
-	game->player_img = mlx_xpm_file_to_image(game->mlx, "textures/perso_centre.xpm", &width, &height);
+	game->player_img = mlx_xpm_file_to_image(game->mlx, "textures/perso_down.xpm", &width, &height);
 	game->collectible_img = mlx_xpm_file_to_image(game->mlx, "textures/collectible.xpm", &width, &height);
 	game->exit_img = mlx_xpm_file_to_image(game->mlx, "textures/exit.xpm", &width, &height);
+	game->player_img_up = mlx_xpm_file_to_image(game->mlx, "textures/perso_back.xpm", &width, &height);
+	game->player_img_down = mlx_xpm_file_to_image(game->mlx, "textures/perso_down.xpm", &width, &height);
+	game->player_img_left = mlx_xpm_file_to_image(game->mlx, "textures/perso_left.xpm", &width, &height);
+	game->player_img_right = mlx_xpm_file_to_image(game->mlx, "textures/perso_right.xpm", &width, &height);
+	game->current_player_img = game->player_img_down; // Position initiale
+
 	if (!game->floor_img || !game->wall_img || !game->player_img
 		|| !game->collectible_img || !game->exit_img)
 		return (0);
@@ -76,18 +85,11 @@ int	can_reach_exit_after_collecting(char **map, int x, int y, t_game *game)
 {
 	if (x < 0 || y < 0 || x >= game->map_width || y >= game->map_height)
 		return (0);
-	// Ignorez les cases non marchables ou déjà visitées
-	if (map[y][x] == '1' || map[y][x] == 'V') // 'V' pour Visité
+	if (map[y][x] == '1' || map[y][x] == 'V')
 		return (0);
-
-	// Si on atteint la sortie, c'est valide
 	if (map[y][x] == 'E')
 		return (1);
-
-	// Marquez la case comme visitée
 	map[y][x] = 'V';
-
-	// Explorez dans les 4 directions
 	return (can_reach_exit_after_collecting(map, x + 1, y, game)
 		|| can_reach_exit_after_collecting(map, x - 1, y, game)
 		|| can_reach_exit_after_collecting(map, x, y + 1, game)
@@ -124,7 +126,6 @@ int	is_map_playable(t_game *game)
 	int		player_y = -1;
 	int		y;
 
-	// Étape 1 : Faire une copie de la carte
 	copy = malloc(sizeof(char *) * (game->map_height + 1));
 	if (!copy)
 		return (0);
@@ -135,8 +136,6 @@ int	is_map_playable(t_game *game)
 		y++;
 	}
 	copy[y] = NULL;
-
-	// Étape 2 : Trouver la position du joueur
 	y = 0;
 	while (y < game->map_height)
 	{
@@ -153,7 +152,6 @@ int	is_map_playable(t_game *game)
 		}
 		y++;
 	}
-
 	if (player_x == -1 || player_y == -1)
 	{
 		ft_printf("Error: Player position not found.\n");

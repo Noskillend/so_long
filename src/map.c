@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:06:46 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/16 21:21:46 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/20 11:29:18 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,11 @@ int	check_valid_characters(t_game *game)
 int	check_rectangular(t_game *game)
 {
 	int	i;
-	
+
 	i = 0;
-	while(game->map[i])
+	while (game->map[i])
 	{
-		if((int)ft_strlen(game->map[i]) != game->map_width)
+		if ((int)ft_strlen(game->map[i]) != game->map_width)
 		{
 			ft_printf("Error: Map is not rectangular.\n");
 			return (0);
@@ -86,34 +86,29 @@ int	check_surrounded_by_walls(t_game *game)
 	return (1);
 }
 
-int check_required_elements(t_game *game)
+int	check_required_elements(t_game *game)
 {
 	int	x;
 	int	y;
-	int	player;
-	int	exit;
-	int	collectible;
 
-	player = 0;
-	exit = 0;
-	collectible = 0;
-	y = 0;
-	while (y < game->map_height)
+	game->collectibles = 0;
+	game->player_count = 0;
+	game->exit_count = 0;
+	y = -1;
+	while (y++ < game->map_height)
 	{
-		x = 0;
-		while (x < game->map_width)
+		x = -1;
+		while (x++ < game->map_width)
 		{
-			if (game->map[y][x] == 'P')
-				player++;
+			if (game->map[y][x] == 'C')
+				game->collectibles++;
+			else if (game->map[y][x] == 'P')
+				game->player_count++;
 			else if (game->map[y][x] == 'E')
-				exit++;
-			else if (game->map[y][x] == 'C')
-				collectible++;
-			x++;
+				game->exit_count++;
 		}
-		y++;
 	}
-	if (player != 1 || exit != 1 || collectible < 1)
+	if (game->player_count != 1 || game->exit_count != 1 || game->collectibles < 1)
 	{
 		ft_printf("Error: Map is missing required elements.\n");
 		return (0);
@@ -121,7 +116,7 @@ int check_required_elements(t_game *game)
 	return (1);
 }
 
-int validate_map(t_game *game)
+int	validate_map(t_game *game)
 {
 	if (!game->map || game->map_width <= 0 || game->map_height <= 0)
 	{
@@ -159,7 +154,6 @@ int	count_lines(const char *path)
 	close(fd);
 	return (lines + 1);
 }
-
 
 char	**load_map(const char *map_path, int *width, int *height)
 {
@@ -214,7 +208,7 @@ int	is_valid_extension(const char *filename, const char *ext)
 	int	filename_len;
 	int	ext_len;
 
-	if(!filename || !ext)
+	if (!filename || !ext)
 		return (0);
 	filename_len = ft_strlen(filename);
 	ext_len = ft_strlen(ext);
