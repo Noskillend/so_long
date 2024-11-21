@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:31:38 by jco               #+#    #+#             */
-/*   Updated: 2024/11/20 21:27:47 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/21 17:46:09 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,14 @@ typedef struct s_game
 
 }	t_game;
 
+typedef struct s_flood
+{
+	char	target;
+	char	**map;
+	int		width;
+	int		height;
+}	t_flood;
+
 int		init_game(t_game *game, const char *map_path);
 int		load_player_textures(t_game *game);
 int		load_static_textures(t_game *game);
@@ -72,7 +80,6 @@ int		check_surrounded_by_walls(t_game *game);
 int		count_elements(t_game *game, int x, int y);
 int		check_required_elements(t_game *game);
 int		count_lines(const char *path);
-int		flood_fill(char **map, int x, int y, t_game *game, char target);
 int		can_reach_exit_after_collecting(char **map, int x, int y, t_game *game);
 int		count_remaining_elements(char **map, int height, int width, char element);
 int		is_map_playable(t_game *game);
@@ -86,5 +93,6 @@ int		validate_map_and_extension(t_game *game, const char *map_path);
 int		initialize_images(t_game *game, int *width, int *height);
 int		initialize_window_and_images(t_game *game);
 
+int		flood_fill(t_flood *data, int x, int y);
 #endif
 

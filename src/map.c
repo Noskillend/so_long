@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:06:46 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/20 17:30:54 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/21 21:44:07 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,23 +127,38 @@ int	check_required_elements(t_game *game)
 
 int	validate_map(t_game *game)
 {
-	if (!game->map || game->map_width <= 0 || game->map_height <= 0)
+	ft_printf("Checking map characters...\n");
+	if (!check_valid_characters(game))
 	{
-		ft_printf("Error: Invalid map dimensions or map not loaded.\n");
+		ft_printf("Error: Invalid characters in map.\n");
 		return (0);
 	}
-	if (!check_valid_characters(game))
-		return (0);
+
+	ft_printf("Checking map rectangle...\n");
 	if (!check_rectangular(game))
+	{
+		ft_printf("Error: Map is not rectangular.\n");
 		return (0);
+	}
+
+	ft_printf("Checking map walls...\n");
 	if (!check_surrounded_by_walls(game))
+	{
+		ft_printf("Error: Map is not surrounded by walls.\n");
 		return (0);
+	}
+
+	ft_printf("Checking required elements...\n");
 	if (!check_required_elements(game))
+	{
+		ft_printf("Error: Map is missing required elements.\n");
 		return (0);
-	if (!is_map_playable(game))
-		return (0);
+	}
+
 	return (1);
 }
+
+
 
 int	count_lines(const char *path)
 {

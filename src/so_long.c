@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:38:09 by jco               #+#    #+#             */
-/*   Updated: 2024/11/20 21:27:05 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/21 22:07:34 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,31 @@ void	init_struct(t_game *game)
 
 int	validate_map_and_extension(t_game *game, const char *map_path)
 {
-	game->map = load_map(map_path, &game->map_width, &game->map_height);
-	if (!is_valid_extension(map_path, ".ber"))
-	{
-		ft_printf("Error: Invalid map extension.\n");
-		return (0);
-	}
-	if (!game->map || !validate_map(game))
-	{
-		ft_printf("Error: Map validation failed.\n");
-		return (0);
-	}
-	return (1);
+    ft_printf("Validating map extension...\n");
+    if (!is_valid_extension(map_path, ".ber"))
+    {
+        ft_printf("Error: Invalid map extension.\n");
+        return (0);
+    }
+
+    ft_printf("Loading map...\n");
+    game->map = load_map(map_path, &game->map_width, &game->map_height);
+    if (!game->map)
+    {
+        ft_printf("Error: Failed to load map.\n");
+        return (0);
+    }
+
+    ft_printf("Validating map structure...\n");
+    if (!validate_map(game))
+    {
+        ft_printf("Error: Map structure is invalid.\n");
+        return (0);
+    }
+
+    return (1);
 }
+
 
 int	initialize_images(t_game *game, int *width, int *height)
 {
@@ -85,6 +97,12 @@ int	init_game(t_game *game, const char *map_path)
 	init_struct(game);
 	if (!validate_map_and_extension(game, map_path))
 		return (0);
+	ft_printf("Checking if map is playable...\n");
+	if (!is_map_playable(game))
+	{
+		ft_printf("Error: Map is not playable.\n");
+		return (0);
+	}
 	game->steps = 0;
 	if (!initialize_window_and_images(game))
 		return (0);
@@ -122,26 +140,27 @@ void	destroy_game(t_game *game)
 	destroy_map(game->map);
 }
 
-int	flood_fill(char **map, int x, int y, t_game *game, char target)
+int	flood_fill(t_flood *data, int x, int y)
 {
 	int	count;
 
-	if (x < 0 || y < 0 || x >= game->map_width || y >= game->map_height)
+	if (x < 0 || y < 0 || x >= data->width || y >= data->height)
 		return (0);
-	if (map[y][x] == '1' || map[y][x] == 'V')
+	if (data->map[y][x] == '1' || data->map[y][x] == 'V')
 		return (0);
-	if (map[y][x] == 'E' && target == 'C')
+	if (data->map[y][x] == 'E' && data->target == 'C')
 		return (0);
 	count = 0;
-	if (map[y][x] == target)
+	if (data->map[y][x] == data->target)
 		count++;
-	map[y][x] = 'V';
-	count += flood_fill(map, x + 1, y, game, target);
-	count += flood_fill(map, x - 1, y, game, target);
-	count += flood_fill(map, x, y + 1, game, target);
-	count += flood_fill(map, x, y - 1, game, target);
+	data->map[y][x] = 'V';
+	count += flood_fill(data, x + 1, y);
+	count += flood_fill(data, x - 1, y);
+	count += flood_fill(data, x, y + 1);
+	count += flood_fill(data, x, y - 1);
 	return (count);
 }
+
 
 int	can_reach_exit_after_collecting(char **map, int x, int y, t_game *game)
 {
@@ -193,29 +212,33 @@ void	free_copy(char **copy, int rows)
 int	is_map_playable(t_game *game)
 {
 	char	**copy;
-	int		player_x;
-	int		player_y;
-	int		y;
-	int		collectibles_count;
+	t_flood	data;
+	int		player_x = -1;
+	int		player_y = -1;
+	int		total_collectibles;
 	int		reached_collectibles;
 	int		exit_reachable;
 
-	player_x = -1;
-	player_y = -1;
+	// Dupliquer la carte
+	ft_printf("Duplicating map for validation...\n");
 	copy = malloc(sizeof(char *) * (game->map_height + 1));
 	if (!copy)
 		return (0);
-	for (y = 0; y < game->map_height; y++)
+	for (int y = 0; y < game->map_height; y++)
 	{
 		copy[y] = ft_strdup(game->map[y]);
 		if (!copy[y])
 		{
 			free_copy(copy, y);
+			ft_printf("Error: Failed to duplicate map.\n");
 			return (0);
 		}
 	}
-	copy[y] = NULL;
-	for (y = 0; y < game->map_height; y++)
+	copy[game->map_height] = NULL;
+
+	// Trouver la position du joueur
+	ft_printf("Finding player position...\n");
+	for (int y = 0; y < game->map_height; y++)
 	{
 		for (int x = 0; x < game->map_width; x++)
 		{
@@ -233,23 +256,45 @@ int	is_map_playable(t_game *game)
 		free_copy(copy, game->map_height);
 		return (0);
 	}
-	collectibles_count = count_remaining_elements(game->map, game->map_height, game->map_width, 'C');
-	reached_collectibles = flood_fill(copy, player_x, player_y, game, 'C');
-	if (reached_collectibles != collectibles_count)
+
+	// Vérification des collectibles
+	ft_printf("Validating collectibles...\n");
+	data.map = copy;
+	data.width = game->map_width;
+	data.height = game->map_height;
+	data.target = 'C';
+	total_collectibles = count_remaining_elements(game->map, game->map_height, game->map_width, 'C');
+	reached_collectibles = flood_fill(&data, player_x, player_y);
+	ft_printf("Total collectibles: %d, Reached: %d\n", total_collectibles, reached_collectibles);
+	if (reached_collectibles != total_collectibles)
 	{
 		ft_printf("Error: Not all collectibles are reachable.\n");
 		free_copy(copy, game->map_height);
 		return (0);
 	}
-	for (y = 0; y < game->map_height; y++)
+
+	// Vérification de la sortie
+	ft_printf("Validating exit...\n");
+	for (int y = 0; y < game->map_height; y++)
 		ft_memcpy(copy[y], game->map[y], game->map_width);
-	exit_reachable = flood_fill(copy, player_x, player_y, game, 'E');
-	if (exit_reachable == 0)
+	data.target = 'E';
+	exit_reachable = flood_fill(&data, player_x, player_y);
+	ft_printf("Exit reachable: %d\n", exit_reachable);
+	if (!exit_reachable)
 	{
 		ft_printf("Error: Exit is not reachable after collecting all collectibles.\n");
 		free_copy(copy, game->map_height);
 		return (0);
 	}
+
+	// Libération et validation réussie
 	free_copy(copy, game->map_height);
+	ft_printf("Map is playable.\n");
 	return (1);
 }
+
+
+
+
+
+
