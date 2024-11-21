@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:38:09 by jco               #+#    #+#             */
-/*   Updated: 2024/11/21 22:07:34 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/21 22:34:38 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,10 +110,8 @@ int	init_game(t_game *game, const char *map_path)
 }
 
 
-void	destroy_game(t_game *game)
+static void	destroy_images(t_game *game)
 {
-	if (game->win)
-		mlx_destroy_window(game->mlx, game->win);
 	if (game->floor_img)
 		mlx_destroy_image(game->mlx, game->floor_img);
 	if (game->wall_img)
@@ -132,13 +130,26 @@ void	destroy_game(t_game *game)
 		mlx_destroy_image(game->mlx, game->collectible_img);
 	if (game->exit_img)
 		mlx_destroy_image(game->mlx, game->exit_img);
+}
+
+static void	destroy_mlx(t_game *game)
+{
+	if (game->win)
+		mlx_destroy_window(game->mlx, game->win);
 	if (game->mlx)
 	{
 		mlx_destroy_display(game->mlx);
 		free(game->mlx);
 	}
+}
+
+void	destroy_game(t_game *game)
+{
+	destroy_images(game);
+	destroy_mlx(game);
 	destroy_map(game->map);
 }
+
 
 int	flood_fill(t_flood *data, int x, int y)
 {
