@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:31:38 by jco               #+#    #+#             */
-/*   Updated: 2024/11/21 17:46:09 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/23 21:55:48 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ int		fil_map(char **map, int fd, int lines);
 char	**load_map(const char *map_path, int *width, int *height);
 void	destroy_map(char **map);
 void	destroy_game(t_game *game);
-int		find_player_position(t_game *game, int *player_x, int *player_y);
 int 	validate_player_position(t_game *game, char **copy);
 int		validate_map(t_game *game);
 int		check_valid_characters(t_game *game);
