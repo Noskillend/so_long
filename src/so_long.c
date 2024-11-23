@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:38:09 by jco               #+#    #+#             */
-/*   Updated: 2024/11/23 22:00:45 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/23 22:14:24 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,115 +219,122 @@ void	free_copy(char **copy, int rows)
 	free(copy);
 }
 
-static char **duplicate_map(t_game *game)
+static char	**duplicate_map(t_game *game)
 {
-    char    **copy;
-    int     y;
+	char	**copy;
+	int		y;
 
-    copy = malloc(sizeof(char *) * (game->map_height + 1));
-    if (!copy)
-        return (NULL);
-    y = 0;
-    while (y < game->map_height)
-    {
-        copy[y] = ft_strdup(game->map[y]);
-        if (!copy[y])
-        {
-            free_copy(copy, y);
-            return (NULL);
-        }
-        y++;
-    }
-    copy[game->map_height] = NULL;
-    return (copy);
+	copy = malloc(sizeof(char *) * (game->map_height + 1));
+	if (!copy)
+		return (NULL);
+	y = 0;
+	while (y < game->map_height)
+	{
+		copy[y] = ft_strdup(game->map[y]);
+		if (!copy[y])
+		{
+			free_copy(copy, y);
+			return (NULL);
+		}
+		y++;
+	}
+	copy[game->map_height] = NULL;
+	return (copy);
 }
 
-static int find_player_position(t_game *game, int *x, int *y)
+static int	find_player_position(t_game *game, int *x, int *y)
 {
-    int     i;
-    int     j;
+	int	i;
+	int	j;
 
-    i = 0;
-    while (i < game->map_height)
-    {
-        j = 0;
-        while (j < game->map_width)
-        {
-            if (game->map[i][j] == 'P')
-            {
-                *x = j;
-                *y = i;
-                return (1);
-            }
-            j++;
-        }
-        i++;
-    }
-    return (0);
+	i = 0;
+	while (i < game->map_height)
+	{
+		j = 0;
+		while (j < game->map_width)
+		{
+			if (game->map[i][j] == 'P')
+			{
+				*x = j;
+				*y = i;
+				return (1);
+			}
+			j++;
+		}
+		i++;
+	}
+	return (0);
 }
 
-static int validate_collectibles(t_game *game, char **copy, int px, int py)
+static int	validate_collectibles(t_game *game, char **copy, int px, int py)
 {
-    t_flood data;
-    int     total_collectibles;
-    int     reached_collectibles;
+	t_flood	data;
+	int		total_collectibles;
+	int		reached_collectibles;
 
-    data.map = copy;
-    data.width = game->map_width;
-    data.height = game->map_height;
-    data.target = 'C';
-    total_collectibles = count_remaining_elements(game->map,
-            game->map_height, game->map_width, 'C');
-    reached_collectibles = flood_fill(&data, px, py);
-    ft_printf("Total collectibles: %d, Reached: %d\n",
-            total_collectibles, reached_collectibles);
-    return (reached_collectibles == total_collectibles);
+	data.map = copy;
+	data.width = game->map_width;
+	data.height = game->map_height;
+	data.target = 'C';
+	total_collectibles = count_remaining_elements(game->map,
+			game->map_height, game->map_width, 'C');
+	reached_collectibles = flood_fill(&data, px, py);
+	ft_printf("Total collectibles: %d, Reached: %d\n",
+			total_collectibles, reached_collectibles);
+	return (reached_collectibles == total_collectibles);
 }
 
-static int validate_exit(t_game *game, char **copy, int px, int py)
+static int	validate_exit(t_game *game, char **copy, int px, int py)
 {
-    t_flood data;
-    int     exit_reachable;
+	t_flood	data;
+	int		exit_reachable;
 
-    data.map = copy;
-    data.width = game->map_width;
-    data.height = game->map_height;
-    data.target = 'E';
-    exit_reachable = flood_fill(&data, px, py);
-    ft_printf("Exit reachable: %d\n", exit_reachable);
-    return (exit_reachable);
+	data.map = copy;
+	data.width = game->map_width;
+	data.height = game->map_height;
+	data.target = 'E';
+	exit_reachable = flood_fill(&data, px, py);
+	ft_printf("Exit reachable: %d\n", exit_reachable);
+	return (exit_reachable);
+}
+
+static int validate_elements(t_game *game, int player_x, int player_y)
+{
+	char	**copy;
+
+	copy = duplicate_map(game);
+	if (!copy || !validate_collectibles(game, copy, player_x, player_y))
+	{
+		ft_printf("Error: Not all collectibles are reachable.\n");
+		free_copy(copy, game->map_height);
+		return (0);
+	}
+	free_copy(copy, game->map_height);
+	copy = duplicate_map(game);
+	if (!copy || !validate_exit(game, copy, player_x, player_y))
+	{
+		ft_printf("Error: Exit is not reachable.\n");
+		free_copy(copy, game->map_height);
+		return (0);
+	}
+	free_copy(copy, game->map_height);
+	return (1);
 }
 
 int is_map_playable(t_game *game)
 {
-    char    **copy;
-    int     player_x;
-    int     player_y;
+	char	**copy;
+	int		player_x;
+	int		player_y;
 
-    copy = duplicate_map(game);
-    if (!copy)
-        return (0);
-    if (!find_player_position(game, &player_x, &player_y))
-    {
-        free_copy(copy, game->map_height);
-        return (0);
-    }
-    if (!validate_collectibles(game, copy, player_x, player_y))
-    {
-        ft_printf("Error: Not all collectibles are reachable.\n");
-        free_copy(copy, game->map_height);
-        return (0);
-    }
-    free_copy(copy, game->map_height);
-    copy = duplicate_map(game);
-    if (!copy)
-        return (0);
-    if (!validate_exit(game, copy, player_x, player_y))
-    {
-        ft_printf("Error: Exit is not reachable.\n");
-        free_copy(copy, game->map_height);
-        return (0);
-    }
-    free_copy(copy, game->map_height);
-    return (1);
+	copy = duplicate_map(game);
+	if (!copy || !find_player_position(game, &player_x, &player_y))
+	{
+		free_copy(copy, game->map_height);
+		ft_printf("Error: Player position not found.\n");
+		return (0);
+	}
+	free_copy(copy, game->map_height);
+	return (validate_elements(game, player_x, player_y));
 }
+
