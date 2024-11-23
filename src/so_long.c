@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:38:09 by jco               #+#    #+#             */
-/*   Updated: 2024/11/23 22:14:24 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/23 23:38:53 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ int	validate_map_and_extension(t_game *game, const char *map_path)
         ft_printf("Error: Invalid map extension.\n");
         return (0);
     }
-
     ft_printf("Loading map...\n");
     game->map = load_map(map_path, &game->map_width, &game->map_height);
     if (!game->map)
@@ -34,14 +33,14 @@ int	validate_map_and_extension(t_game *game, const char *map_path)
         ft_printf("Error: Failed to load map.\n");
         return (0);
     }
-
     ft_printf("Validating map structure...\n");
     if (!validate_map(game))
     {
         ft_printf("Error: Map structure is invalid.\n");
+		destroy_map(game->map);
+		game->map = NULL;
         return (0);
     }
-
     return (1);
 }
 

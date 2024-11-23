@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:06:46 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/23 22:14:16 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/23 23:43:11 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,38 +125,31 @@ int	check_required_elements(t_game *game)
 	return (1);
 }
 
-int	validate_map(t_game *game)
+int validate_map(t_game *game)
 {
-	ft_printf("Checking map characters...\n");
-	if (!check_valid_characters(game))
-	{
-		ft_printf("Error: Invalid characters in map.\n");
-		return (0);
-	}
+    ft_printf("Checking for empty lines...\n");
+    if (!check_no_empty_lines(game))
+        return (0);
 
-	ft_printf("Checking map rectangle...\n");
-	if (!check_rectangular(game))
-	{
-		ft_printf("Error: Map is not rectangular.\n");
-		return (0);
-	}
+    ft_printf("Checking map characters...\n");
+    if (!check_valid_characters(game))
+        return (0);
 
-	ft_printf("Checking map walls...\n");
-	if (!check_surrounded_by_walls(game))
-	{
-		ft_printf("Error: Map is not surrounded by walls.\n");
-		return (0);
-	}
+    ft_printf("Checking map rectangle...\n");
+    if (!check_rectangular(game))
+        return (0);
 
-	ft_printf("Checking required elements...\n");
-	if (!check_required_elements(game))
-	{
-		ft_printf("Error: Map is missing required elements.\n");
-		return (0);
-	}
+    ft_printf("Checking map walls...\n");
+    if (!check_surrounded_by_walls(game))
+        return (0);
 
-	return (1);
+    ft_printf("Checking required elements...\n");
+    if (!check_required_elements(game))
+        return (0);
+
+    return (1);
 }
+
 
 
 
@@ -209,50 +202,82 @@ char	*read_and_trim_line(int fd)
 	return (line);
 }
 
-int	fill_map(char **map, int fd, int lines)
+int fill_map(char **map, int fd, int lines)
 {
-	int		i;
-	char	*line;
+    int i;
+    char *line;
 
-	i = 0;
-	while (i < lines)
-	{
-		line = read_and_trim_line(fd);
-		if (!line)
-			break ;
-		map[i++] = line;
-	}
-	map[i] = NULL;
-	return (i);
+    i = 0;
+    while (i < lines)
+    {
+        line = read_and_trim_line(fd);
+        if (!line || ft_strlen(line) == 0) // Vérifie si la ligne est vide
+        {
+            ft_printf("Error: Map contains an empty line.\n");
+            free(line);
+            while (i > 0) // Libère les lignes déjà allouées
+                free(map[--i]);
+            return (0);
+        }
+        map[i++] = line;
+    }
+    map[i] = NULL;
+    return (1);
 }
 
-char	**load_map(const char *map_path, int *width, int *height)
-{
-	int		fd;
-	int		lines;
-	int		i;
-	char	**map;
 
-	lines = count_lines(map_path);
-	if (lines <= 0)
-		return (NULL);
-	map = allocate_map(lines);
-	if (!map)
-		return (NULL);
-	fd = open_file(map_path);
-	if (fd < 0)
-		return (NULL);
-	i = fill_map(map, fd, lines);
-	close(fd);
-	if (i == 0)
-	{
-		free(map);
-		return (NULL);
-	}
-	*width = ft_strlen(map[0]);
-	*height = lines;
-	return (map);
+int check_no_empty_lines(t_game *game)
+{
+    int y;
+
+    y = 0;
+    while (y < game->map_height)
+    {
+        if (ft_strlen(game->map[y]) == 0)
+        {
+            ft_printf("Error: Map contains an empty line.\n");
+            return (0);
+        }
+        y++;
+    }
+    return (1);
 }
+
+
+char **load_map(const char *map_path, int *width, int *height)
+{
+    int fd;
+    int lines;
+    char **map;
+
+    lines = count_lines(map_path);
+    if (lines <= 0)
+        return (NULL);
+
+    map = allocate_map(lines);
+    if (!map)
+        return (NULL);
+
+    fd = open_file(map_path);
+    if (fd < 0)
+    {
+        free(map);
+        return (NULL);
+    }
+
+    if (!fill_map(map, fd, lines))
+    {
+        free(map);
+        close(fd);
+        return (NULL);
+    }
+
+    close(fd);
+    *width = ft_strlen(map[0]);
+    *height = lines;
+    return (map);
+}
+
 
 void	destroy_map(char **map)
 {

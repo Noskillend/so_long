@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:31:38 by jco               #+#    #+#             */
-/*   Updated: 2024/11/23 21:55:48 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/23 23:38:02 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,5 +93,6 @@ int		initialize_images(t_game *game, int *width, int *height);
 int		initialize_window_and_images(t_game *game);
 
 int		flood_fill(t_flood *data, int x, int y);
+int		check_no_empty_lines(t_game *game);
 #endif
 
