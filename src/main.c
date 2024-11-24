@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:03:03 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/20 12:59:59 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/24 23:52:25 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 int	handle_close(t_game *game)
 {
-	ft_printf("Exiting game via window close button...\n");
 	destroy_game(game);
 	exit(0);
 	return (0);
@@ -30,7 +29,6 @@ int	main(int argc, char **argv)
 		ft_printf("Error: Invalid number of arguments.\n");
 		return (1);
 	}
-	ft_printf("Initializing game...\n");
 	if (!init_game(&game, argv[1]))
 	{
 		ft_printf("Error: Failed to initialize the game.\n");
