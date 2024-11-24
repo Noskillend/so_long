@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 21:27:30 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/25 00:05:26 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 00:30:59 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,10 @@ int	handle_keypress(int keycode, t_game *game)
 	return (0);
 }
 
-void	move_player(t_game *game, int new_x, int new_y, char direction)
-{
-	char	next_tile;
+// fichier mouvement.c
 
+static void	update_player_image(t_game *game, char direction)
+{
 	if (direction == 'W')
 		game->current_player_img = game->player_img_up;
 	else if (direction == 'A')
@@ -42,12 +42,12 @@ void	move_player(t_game *game, int new_x, int new_y, char direction)
 		game->current_player_img = game->player_img_down;
 	else if (direction == 'D')
 		game->current_player_img = game->player_img_right;
-	next_tile = game->map[new_y][new_x];
+}
+
+static int	handle_next_tile(t_game *game, char next_tile)
+{
 	if (next_tile == '1')
-	{
-		render_map(game);
-		return ;
-	}
+		return (0);
 	if (next_tile == 'C')
 		game->collectibles--;
 	if (next_tile == 'E')
@@ -61,16 +61,34 @@ void	move_player(t_game *game, int new_x, int new_y, char direction)
 		else
 		{
 			ft_printf("You need to collect all items first!\n");
-			render_map(game);
-			return ;
+			return (0);
 		}
 	}
+	return (1);
+}
+
+static void	update_player_position(t_game *game, int new_x, int new_y)
+{
 	game->map[game->player_y][game->player_x] = '0';
 	game->map[new_y][new_x] = 'P';
 	game->player_x = new_x;
 	game->player_y = new_y;
 	game->steps++;
 	ft_printf("Steps: %d\n", game->steps);
+}
+
+void	move_player(t_game *game, int new_x, int new_y, char direction)
+{
+	char	next_tile;
+
+	update_player_image(game, direction);
+	next_tile = game->map[new_y][new_x];
+	if (!handle_next_tile(game, next_tile))
+	{
+		render_map(game);
+		return ;
+	}
+	update_player_position(game, new_x, new_y);
 	render_map(game);
 }
 
@@ -99,10 +117,19 @@ void	setup_player_position(t_game *game)
 
 void	print_map(char **map, int height, int width)
 {
-	for (int y = 0; y < height; y++)
+	int	y;
+	int	x;
+
+	y = 0;
+	while (y < height)
 	{
-		for (int x = 0; x < width; x++)
+		x = 0;
+		while (x < width)
+		{
 			ft_printf("%c", map[y][x]);
+			x++;
+		}
 		ft_printf("\n");
+		y++;
 	}
 }
