@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+         #
+#    By: jco <jco@student.42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/15 11:16:51 by jco               #+#    #+#              #
-#    Updated: 2024/11/16 01:52:07 by noskillend       ###   ########.fr        #
+#    Updated: 2024/11/25 18:43:26 by jco              ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,8 +24,18 @@ MLX_DIR = minilibx
 LIBFT_DIR = libft
 
 # Sources et objets
-SRCS = $(wildcard $(SRCS_DIR)/*.c)
-OBJS = $(patsubst $(SRCS_DIR)/%.c, $(OBJS_DIR)/%.o, $(SRCS))
+SRCS = $(SRCS_DIR)/main.c \
+       $(SRCS_DIR)/map.c \
+       $(SRCS_DIR)/init.c \
+       $(SRCS_DIR)/free.c \
+       $(SRCS_DIR)/check_element_map.c \
+       $(SRCS_DIR)/check_elment_map2.c \
+       $(SRCS_DIR)/render.c \
+       $(SRCS_DIR)/mouvement.c \
+       $(SRCS_DIR)/utils.c \
+	   $(SRCS_DIR)/flood_fill.c \
+	   $(SRCS_DIR)/so_long.c
+OBJS = $(SRCS:$(SRCS_DIR)/%.c=$(OBJS_DIR)/%.o)
 
 # Bibliothèques
 LIBFT = $(LIBFT_DIR)/libft.a
