@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:38:09 by jco               #+#    #+#             */
-/*   Updated: 2024/11/25 02:36:28 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 03:16:47 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ static int	validate_collectibles(t_game *game, char **copy, int px, int py)
 	data.width = game->map_width;
 	data.height = game->map_height;
 	data.target = 'C';
-	total_collectibles = count_remaining_elements(game->map,
+	total_collectibles = count_remaining_elem(game->map,
 			game->map_height, game->map_width, 'C');
 	reached_collectibles = flood_fill(&data, px, py);
 	return (reached_collectibles == total_collectibles);

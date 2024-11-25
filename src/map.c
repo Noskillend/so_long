@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:06:46 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/25 02:39:19 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 03:47:46 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,4 +83,26 @@ char	**load_map(const char *map_path, int *width, int *height)
 	*width = ft_strlen(map[0]);
 	*height = lines;
 	return (map);
+}
+
+int	is_map_length_valid(t_game *game)
+{
+	int	y;
+
+	y = 0;
+	while (game->map[y])
+	{
+		if ((int)ft_strlen(game->map[y]) > MAX_MAP_WIDTH)
+		{
+			ft_printf("Error: Line exceeds %d columns.\n", MAX_MAP_WIDTH);
+			return (0);
+		}
+		y++;
+	}
+	if (y > MAX_MAP_HEIGHT)
+	{
+		ft_printf("Error: Map exceeds %d rows.\n", MAX_MAP_HEIGHT);
+		return (0);
+	}
+	return (1);
 }

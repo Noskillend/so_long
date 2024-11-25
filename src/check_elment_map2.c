@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 01:19:11 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/25 02:20:07 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 03:43:21 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ int	validate_map(t_game *game)
 	if (!check_surrounded_by_walls(game))
 		return (0);
 	if (!check_required_elements(game))
+		return (0);
+	if (!is_map_length_valid(game))
 		return (0);
 	return (1);
 }

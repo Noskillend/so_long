@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 01:20:05 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/25 02:36:47 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 03:16:31 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	print_map(char **map, int height, int width)
 	}
 }
 
-int	count_remaining_elements(char **map, int height, int width, char element)
+int	count_remaining_elem(char **map, int height, int width, char element)
 {
 	int	x;
 	int	y;
