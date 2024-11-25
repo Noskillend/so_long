@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:07:41 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/25 00:35:18 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 02:23:23 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,29 @@ void	render_map(t_game *game)
 		while (x < game->map_width)
 		{
 			render_tile(game, x, y);
+			x++;
+		}
+		y++;
+	}
+}
+
+void	setup_player_position(t_game *game)
+{
+	int	x;
+	int	y;
+
+	y = 0;
+	while (y < game->map_height)
+	{
+		x = 0;
+		while (x < game->map_width)
+		{
+			if (game->map[y][x] == 'P')
+			{
+				game->player_x = x;
+				game->player_y = y;
+				return ;
+			}
 			x++;
 		}
 		y++;

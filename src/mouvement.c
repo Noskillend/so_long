@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 21:27:30 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/25 00:30:59 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 02:23:29 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@ int	handle_keypress(int keycode, t_game *game)
 	}
 	return (0);
 }
-
-// fichier mouvement.c
 
 static void	update_player_image(t_game *game, char direction)
 {
@@ -90,46 +88,4 @@ void	move_player(t_game *game, int new_x, int new_y, char direction)
 	}
 	update_player_position(game, new_x, new_y);
 	render_map(game);
-}
-
-void	setup_player_position(t_game *game)
-{
-	int	x;
-	int	y;
-
-	y = 0;
-	while (y < game->map_height)
-	{
-		x = 0;
-		while (x < game->map_width)
-		{
-			if (game->map[y][x] == 'P')
-			{
-				game->player_x = x;
-				game->player_y = y;
-				return ;
-			}
-			x++;
-		}
-		y++;
-	}
-}
-
-void	print_map(char **map, int height, int width)
-{
-	int	y;
-	int	x;
-
-	y = 0;
-	while (y < height)
-	{
-		x = 0;
-		while (x < width)
-		{
-			ft_printf("%c", map[y][x]);
-			x++;
-		}
-		ft_printf("\n");
-		y++;
-	}
 }

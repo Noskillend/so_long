@@ -6,7 +6,7 @@
 /*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:31:38 by jco               #+#    #+#             */
-/*   Updated: 2024/11/23 23:38:02 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 02:37:36 by noskillend       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,5 +94,7 @@ int		initialize_window_and_images(t_game *game);
 
 int		flood_fill(t_flood *data, int x, int y);
 int		check_no_empty_lines(t_game *game);
+char	**duplicate_map(t_game *game);
+void	free_copy(char **copy, int rows);
 #endif
 
