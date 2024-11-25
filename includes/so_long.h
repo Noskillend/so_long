@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   so_long.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
+/*   By: jco <jco@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 11:31:38 by jco               #+#    #+#             */
-/*   Updated: 2024/11/25 03:44:29 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 17:33:28 by jco              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 # include <stdio.h>
 
 # define TILE_SIZE 64
-# define MAX_MAP_HEIGHT 100
-# define MAX_MAP_WIDTH 50
+# define MAX_MAP_HEIGHT 30
+# define MAX_MAP_WIDTH 60
 
 typedef struct s_game
 {
@@ -34,7 +34,7 @@ typedef struct s_game
 	void	*floor_img;
 	void	*wall_img;
 	void	*player_img;
-	void	*collectible_img;
+	void	*c_img;
 	void	*exit_img;
 	int		player_x;
 	int		player_y;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
+/*   By: jco <jco@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 01:24:55 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/25 02:18:43 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 17:34:09 by jco              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,13 @@ void	destroy_map(char **map)
 {
 	int	i;
 
-	i = 0;
 	if (!map)
 		return ;
+	i = 0;
 	while (map[i])
 	{
 		free(map[i]);
+		map[i] = NULL;
 		i++;
 	}
 	free(map);
@@ -54,8 +55,8 @@ static void	destroy_images(t_game *game)
 		mlx_destroy_image(game->mlx, game->player_img_left);
 	if (game->player_img_right)
 		mlx_destroy_image(game->mlx, game->player_img_right);
-	if (game->collectible_img)
-		mlx_destroy_image(game->mlx, game->collectible_img);
+	if (game->c_img)
+		mlx_destroy_image(game->mlx, game->c_img);
 	if (game->exit_img)
 		mlx_destroy_image(game->mlx, game->exit_img);
 }
@@ -76,4 +77,5 @@ void	destroy_game(t_game *game)
 	destroy_images(game);
 	destroy_mlx(game);
 	destroy_map(game->map);
+	ft_bzero(game, sizeof(t_game));
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
+/*   By: jco <jco@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:03:03 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/25 03:30:12 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 17:41:29 by jco              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,45 @@ int	handle_close(t_game *game)
 	destroy_game(game);
 	exit(0);
 	return (0);
+}
+
+int	validate_map_and_extension(t_game *game, const char *map_path)
+{
+	if (!is_valid_extension(map_path, ".ber"))
+	{
+		ft_printf("Error: Invalid map extension.\n");
+		return (0);
+	}
+	game->map = load_map(map_path, &game->map_width, &game->map_height);
+	if (!game->map)
+	{
+		ft_printf("Error: Failed to load map.\n");
+		return (0);
+	}
+	if (!validate_map(game))
+	{
+		ft_printf("Error: Map structure is invalid.\n");
+		destroy_map(game->map);
+		game->map = NULL;
+		return (0);
+	}
+	return (1);
+}
+
+int	init_game(t_game *game, const char *map_path)
+{
+	init_struct(game);
+	if (!validate_map_and_extension(game, map_path))
+		return (0);
+	if (!is_map_playable(game))
+	{
+		ft_printf("Error: Map is not playable.\n");
+		return (0);
+	}
+	game->steps = 0;
+	if (!initialize_window_and_images(game))
+		return (0);
+	return (1);
 }
 
 int	main(int argc, char **argv)

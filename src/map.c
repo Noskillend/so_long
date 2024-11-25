@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: noskillend <noskillend@student.42.fr>      +#+  +:+       +#+        */
+/*   By: jco <jco@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:06:46 by noskillend        #+#    #+#             */
-/*   Updated: 2024/11/25 03:47:46 by noskillend       ###   ########.fr       */
+/*   Updated: 2024/11/25 17:27:45 by jco              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,17 @@
 char	**allocate_map(int lines)
 {
 	char	**map;
+	int		i;
 
 	map = malloc(sizeof(char *) * (lines + 1));
 	if (!map)
 		return (NULL);
+	i = 0;
+	while (i <= lines)
+	{
+		map[i] = NULL;
+		i++;
+	}
 	return (map);
 }
 
@@ -28,6 +35,8 @@ char	*read_and_trim_line(int fd)
 	char	*line;
 
 	line = get_next_line(fd);
+	if (!line)
+		return (NULL);
 	if (line && line[ft_strlen(line) - 1] == '\n')
 		line[ft_strlen(line) - 1] = '\0';
 	return (line);
@@ -44,10 +53,16 @@ int	fill_map(char **map, int fd, int lines)
 		line = read_and_trim_line(fd);
 		if (!line || ft_strlen(line) == 0)
 		{
-			ft_printf("Error: Map contains an empty line.\n");
-			free(line);
+			while (line)
+			{
+				free(line);
+				line = get_next_line(fd);
+			}
 			while (i > 0)
+			{
 				free(map[--i]);
+				map[i] = NULL;
+			}
 			return (0);
 		}
 		map[i++] = line;
@@ -76,8 +91,8 @@ char	**load_map(const char *map_path, int *width, int *height)
 	}
 	if (!fill_map(map, fd, lines))
 	{
-		free(map);
-		return (NULL);
+		destroy_map(map);
+		return (close(fd), NULL);
 	}
 	close(fd);
 	*width = ft_strlen(map[0]);
